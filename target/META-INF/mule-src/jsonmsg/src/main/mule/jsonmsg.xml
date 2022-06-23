@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="54172653-341f-4047-9019-c53912683995" >
+		<http:listener-connection host="0.0.0.0" port="8085" />
+	</http:listener-config>
+	<flow name="jsonmsgFlow" doc:id="8f73f3f4-0b9c-4f8a-b971-67753ece9cd3" >
+		<http:listener doc:name="Listener" doc:id="d1356800-2f26-489e-97ae-fde990a716dc" config-ref="HTTP_Listener_config" path="/jsonarray"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c3dd4092-ea0a-4d0b-b7f9-ae899ca85939" />
+		<ee:transform doc:name="Transform Message" doc:id="3073b8f3-893e-48d5-9577-baea7254e8df" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="order1" ><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	"orderId": 100,
+	"orderName": "Monitor",
+	"orderStatus":"Completed",
+	"quantity": 2,
+	
+}]]></ee:set-variable>
+				<ee:set-variable variableName="order2" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	"orderId": 200,
+	"orderName": "Laptop",
+	"orderStatus":"Progress",
+	"quantity": 4,
+	
+
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="352e5ccb-e1ea-4eb9-a6a3-4e42a4d8b724" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[vars.order1,vars.order2]
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c05e6cd9-04e5-49f1-b13c-3b42c39b7bdd" message="#['array']"/>
+	</flow>
+</mule>
